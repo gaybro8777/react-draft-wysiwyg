@@ -16,41 +16,24 @@ class ImageControl extends Component {
   };
 
   state: Object = {
-    expanded: false,
-  };
-
-  componentWillMount(): void {
-    const { modalHandler } = this.props;
-    modalHandler.registerCallBack(this.expandCollapse);
-  }
-
-  componentWillUnmount(): void {
-    const { modalHandler } = this.props;
-    modalHandler.deregisterCallBack(this.expandCollapse);
-  }
-
-  onExpandEvent: Function = (): void => {
-    this.signalExpanded = !this.state.expanded;
+    expanded: false
   };
 
   doExpand: Function = (): void => {
     this.setState({
       expanded: true,
     });
+    setTimeout(() => {
+      this.props.modalHandler.registerCallBack(this.doCollapse);
+    }, 0);
   };
 
   doCollapse: Function = (): void => {
     this.setState({
       expanded: false,
     });
+    this.props.modalHandler.deregisterCallBack(this.doCollapse);
   };
-
-  expandCollapse: Function = (): void => {
-    this.setState({
-      expanded: this.signalExpanded,
-    });
-    this.signalExpanded = false;
-  }
 
   addImage: Function = (src: string, height: string, width: string, alt: string): void => {
     const { editorState, onChange, config } = this.props;
@@ -81,7 +64,7 @@ class ImageControl extends Component {
         translations={translations}
         onChange={this.addImage}
         expanded={expanded}
-        onExpandEvent={this.onExpandEvent}
+        onExpandEvent={this.doExpand}
         doExpand={this.doExpand}
         doCollapse={this.doCollapse}
       />

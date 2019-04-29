@@ -29,7 +29,6 @@ export default class History extends Component {
         redoDisabled: editorState.getRedoStack().size === 0,
       });
     }
-    modalHandler.registerCallBack(this.expandCollapse);
   }
 
   componentWillReceiveProps(properties: Object): void {
@@ -41,15 +40,6 @@ export default class History extends Component {
       });
     }
   }
-
-  componentWillUnmount(): void {
-    const { modalHandler } = this.props;
-    modalHandler.deregisterCallBack(this.expandCollapse);
-  }
-
-  onExpandEvent: Function = (): void => {
-    this.signalExpanded = !this.state.expanded;
-  };
 
   onChange: Function = (action) => {
     const { editorState, onChange } = this.props;
@@ -63,20 +53,17 @@ export default class History extends Component {
     this.setState({
       expanded: true,
     });
+    setTimeout(() => {
+      this.props.modalHandler.registerCallBack(this.doCollapse);
+    }, 0);
   };
 
   doCollapse: Function = (): void => {
     this.setState({
       expanded: false,
     });
+    this.props.modalHandler.dregisterCallBack(this.doCollapse);
   };
-
-  expandCollapse: Function = (): void => {
-    this.setState({
-      expanded: this.signalExpanded,
-    });
-    this.signalExpanded = false;
-  }
 
   render(): Object {
     const { config, translations } = this.props;
@@ -88,7 +75,7 @@ export default class History extends Component {
         translations={translations}
         currentState={{ undoDisabled, redoDisabled }}
         expanded={expanded}
-        onExpandEvent={this.onExpandEvent}
+        onExpandEvent={this.doExpand}
         doExpand={this.doExpand}
         doCollapse={this.doCollapse}
         onChange={this.onChange}

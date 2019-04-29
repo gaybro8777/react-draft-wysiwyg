@@ -32,7 +32,6 @@ class ColorPicker extends Component {
         currentBgColor: getSelectionCustomInlineStyle(editorState, ['BGCOLOR']).BGCOLOR,
       });
     }
-    modalHandler.registerCallBack(this.expandCollapse);
   }
 
   componentWillReceiveProps(properties: Object): void {
@@ -47,32 +46,20 @@ class ColorPicker extends Component {
     this.setState(newState);
   }
 
-  componentWillUnmount(): void {
-    const { modalHandler } = this.props;
-    modalHandler.deregisterCallBack(this.expandCollapse);
-  }
-
-  onExpandEvent: Function = (): void => {
-    this.signalExpanded = !this.state.expanded;
-  };
-
-  expandCollapse: Function = (): void => {
-    this.setState({
-      expanded: this.signalExpanded,
-    });
-    this.signalExpanded = false;
-  }
-
   doExpand: Function = (): void => {
     this.setState({
       expanded: true,
     });
+    setTimeout(() => {
+      this.props.modalHandler.registerCallBack(this.doCollapse);
+    }, 0);
   };
 
   doCollapse: Function = (): void => {
     this.setState({
       expanded: false,
     });
+    this.props.modalHandler.deregisterCallBack(this.doCollapse);
   };
 
   toggleColor: Function = (style: string, color: string): void => {
@@ -100,7 +87,7 @@ class ColorPicker extends Component {
         translations={translations}
         onChange={this.toggleColor}
         expanded={expanded}
-        onExpandEvent={this.onExpandEvent}
+        onExpandEvent={this.doExpand}
         doExpand={this.doExpand}
         doCollapse={this.doCollapse}
         currentState={{ color, bgColor }}

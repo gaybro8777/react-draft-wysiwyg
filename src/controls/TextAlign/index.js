@@ -19,11 +19,6 @@ export default class TextAlign extends Component {
     currentTextAlignment: undefined,
   }
 
-  componentWillMount(): void {
-    const { modalHandler } = this.props;
-    modalHandler.registerCallBack(this.expandCollapse);
-  }
-
   componentWillReceiveProps(properties) {
     if (properties.editorState !== this.props.editorState) {
       this.setState({
@@ -32,32 +27,20 @@ export default class TextAlign extends Component {
     }
   }
 
-  componentWillUnmount(): void {
-    const { modalHandler } = this.props;
-    modalHandler.deregisterCallBack(this.expandCollapse);
-  }
-
-  onExpandEvent: Function = (): void => {
-    this.signalExpanded = !this.state.expanded;
-  };
-
-  expandCollapse: Function = (): void => {
-    this.setState({
-      expanded: this.signalExpanded,
-    });
-    this.signalExpanded = false;
-  }
-
   doExpand: Function = (): void => {
     this.setState({
       expanded: true,
     });
+    setTimeout(() => {
+      this.props.modalHandler.registerCallBack(this.doCollapse);
+    }, 0);
   };
 
   doCollapse: Function = (): void => {
     this.setState({
       expanded: false,
     });
+    this.props.modalHandler.deregisterCallBack(this.doCollapse);
   };
 
   addBlockAlignmentData:Function = (value: string) => {
@@ -79,7 +62,7 @@ export default class TextAlign extends Component {
         config={config}
         translations={translations}
         expanded={expanded}
-        onExpandEvent={this.onExpandEvent}
+        onExpandEvent={this.doExpand}
         doExpand={this.doExpand}
         doCollapse={this.doCollapse}
         currentState={{ textAlignment: currentTextAlignment }}

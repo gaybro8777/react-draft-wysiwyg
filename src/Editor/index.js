@@ -37,6 +37,8 @@ import localeTranslations from "../i18n";
 import "./styles.css";
 import "../../css/Draft.css";
 
+const sharedModalHandler = new ModalHandler();
+
 export default class WysiwygEditor extends Component {
   static propTypes = {
     onChange: PropTypes.func,
@@ -105,7 +107,7 @@ export default class WysiwygEditor extends Component {
       ? props.wrapperId
       : Math.floor(Math.random() * 10000);
     this.wrapperId = `rdw-wrapper-${wrapperId}`;
-    this.modalHandler = new ModalHandler();
+    this.modalHandler = sharedModalHandler;
     this.focusHandler = new FocusHandler();
     this.blockRendererFn = getBlockRenderFunc(
       {
